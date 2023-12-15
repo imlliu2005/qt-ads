@@ -5,12 +5,17 @@
 #include <QLabel>
 #include <QTimer>
 
+#include <QAction>
+#include <QMessageBox>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    QAction *toolsAction = new QAction(QStringLiteral("SetWindow"));
+    ui->menuView->addAction(toolsAction);
+	connect(toolsAction,SIGNAL(triggered()),this,SLOT(OnCustMenuTriggered()));
     // Create the dock manager. Because the parent parameter is a QMainWindow
     // the dock manager registers itself as the central widget.
 	m_DockManager = new ads::CDockManager(this);
@@ -24,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	// Create a dock widget with the title Label 1 and set the created label
 	// as the dock widget content
-	ads::CDockWidget* DockWidget = new ads::CDockWidget("Label 1");
+	DockWidget = new ads::CDockWidget("Label 1");
 	DockWidget->setWidget(l);
 
 	// Add the toggleViewAction of the dock widget to the menu to give
@@ -38,5 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::OnCustMenuTriggered()
+{
+	DockWidget->set_window_size(200,600);
+    QMessageBox::information(this,this->windowTitle(),QStringLiteral("Set window size success!"));
 }
 

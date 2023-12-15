@@ -45,6 +45,11 @@ struct FloatingDragPreviewPrivate
 	QPixmap ContentPreviewPixmap;
 	bool Canceled = false;
 
+	// window width
+	int window_width_;
+	// window height 
+	int window_height_;
+
 
 	/**
 	 * Private data constructor
@@ -56,6 +61,26 @@ struct FloatingDragPreviewPrivate
 	{
 		Hidden = Value;
 		_this->update();
+	}
+
+	/**
+	 * Init window size
+	 */
+	void init_window_size() 
+	{
+		CDockAreaWidget* DockArea = qobject_cast<CDockAreaWidget*>(Content);
+		if (DockArea) {
+			auto size = DockArea->size();
+			qDebug() << "Window size: " << size.width() << " " << size.height();
+			window_width_ = size.width();
+			window_height_ = size.height();
+			if(DockArea->get_window_width() != 0 && DockArea->get_window_height() != 0) 
+			{
+				window_width_ = DockArea->get_window_width();
+				window_height_ = DockArea->get_window_height();
+				qDebug() << "window_width_: " << window_width_ << " window_height_: "<< window_height_;
+			}
+		}
 	}
 
 	/**
@@ -262,6 +287,8 @@ void FloatingDragPreviewPrivate::createFloatingWidget()
 	if (FloatingWidget)
 	{
 		FloatingWidget->setGeometry(_this->geometry());
+		// 设置固定窗口大小
+		FloatingWidget->setFixedSize(window_width_,window_height_);
 		FloatingWidget->show();
 		if (!CDockManager::testConfigFlag(CDockManager::DragPreviewHasWindowFrame))
 		{
@@ -282,6 +309,7 @@ CFloatingDragPreview::CFloatingDragPreview(QWidget* Content, QWidget* parent) :
 {
 	d->Content = Content;
 	d->ContentFeatures = d->contentFeatures();
+	d->init_window_size();
 	setAttribute(Qt::WA_DeleteOnClose);
 	if (CDockManager::testConfigFlag(CDockManager::DragPreviewHasWindowFrame))
 	{

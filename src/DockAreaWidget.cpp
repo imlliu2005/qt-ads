@@ -264,6 +264,8 @@ struct DockAreaWidgetPrivate
 	DockWidgetAreas		AllowedAreas	= DefaultAllowedAreas;
 	QSize MinSizeHint;
 	CDockAreaWidget::DockAreaFlags Flags{CDockAreaWidget::DefaultFlags};
+	int window_width_ = 0;
+	int window_height_ = 0;
 
 	/**
 	 * Private data constructor
@@ -338,6 +340,12 @@ struct DockAreaWidgetPrivate
 			MinSizeHint.setHeight(qMax(MinSizeHint.height(), Widget->minimumSizeHint().height()));
 			MinSizeHint.setWidth(qMax(MinSizeHint.width(), Widget->minimumSizeHint().width()));
 		}
+	}
+
+	void set_window_size(int width, int height)
+	{
+		window_width_ = width;
+		window_height_ = height;
 	}
 };
 
@@ -1431,6 +1439,24 @@ QSize CDockAreaWidget::minimumSizeHint() const
 	}
 }
 
+//============================================================================
+void CDockAreaWidget::set_window_size(int width, int height) 
+{
+	d->set_window_size(width, height);
+	qDebug() << " window height: " << height;
+}
+
+//============================================================================
+int CDockAreaWidget::get_window_width() 
+{
+	return d->window_width_;
+}
+
+//============================================================================
+int CDockAreaWidget::get_window_height() 
+{
+	return d->window_height_;
+}
 
 //============================================================================
 void CDockAreaWidget::onDockWidgetFeaturesChanged()

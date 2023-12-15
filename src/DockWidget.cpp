@@ -1331,6 +1331,17 @@ CDockWidget::eToolBarStyleSource CDockWidget::toolBarStyleSource() const
 	return d->ToolBarStyleSource;
 }
 
+void CDockWidget::set_window_size(int width, int height)
+{
+	if(d->DockArea) 
+	{
+		d->DockArea->set_window_size(width, height);
+	}
+	else 
+	{
+		qDebug() << "d->DockArea is nullptr ...";
+	}
+}
 
 } // namespace ads
 

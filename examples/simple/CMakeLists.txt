@@ -3,7 +3,7 @@ project(ads_example_simple VERSION ${VERSION_SHORT})
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.5 COMPONENTS Core Gui Widgets REQUIRED)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-add_executable(SimpleExample WIN32 
+add_executable(SimpleExample  #WIN32 
     main.cpp
     MainWindow.cpp
     MainWindow.ui

@@ -387,6 +387,18 @@ public:
      */
     bool isTopLevelArea() const;
 
+    /**
+     * set float window width height
+     */
+	void set_window_size(int width, int height);
+	/**
+     * get the window width
+     */
+	int get_window_width();
+	/**
+     * get window height
+     */
+	int get_window_height(); 
 
 public Q_SLOTS:
 	/**

@@ -520,6 +520,12 @@ public:
      */
     QSize toolBarIconSize(eState State) const;
 
+     /**
+     * Set dock window width and height
+     */
+
+    void set_window_size(int width, int height);
+
     /**
      * Set the actions that will be shown in the dock area title bar
      * if this dock widget is the active tab.
