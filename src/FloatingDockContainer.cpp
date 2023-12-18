@@ -45,7 +45,7 @@
 #include "DockManager.h"
 #include "DockWidget.h"
 #include "DockOverlay.h"
-
+#include "title_bar.h"
 #ifdef Q_OS_WIN
 #include <windows.h>
 #ifdef _MSC_VER
@@ -374,6 +374,7 @@ struct FloatingDockContainerPrivate
 	QPoint DragStartPos;
 	bool Hiding = false;
 	bool AutoHideChildren = true;
+	QTitleBar *m_titleBar = nullptr;
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
     QWidget* MouseEventHandler = nullptr;
     CFloatingWidgetTitleBar* TitleBar = nullptr;
@@ -660,6 +661,18 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 	connect(d->DockContainer, SIGNAL(dockAreasRemoved()), this,
 	    SLOT(onDockAreasAddedOrRemoved()));
 
+
+	/************************************************************************/
+	d->m_titleBar = new QTitleBar(this);
+
+	connect(d->m_titleBar, &QTitleBar::requestClose,this, &CFloatingDockContainer::close);
+    connect(d->m_titleBar, &QTitleBar::requestMaximize, [this](){
+            if (this->isMaximized())
+                this->showNormal();
+             else
+                this->showMaximized(); });
+    connect(d->m_titleBar, &QTitleBar::requestMinimize,this, &CFloatingDockContainer::showMinimized);
+	/************************************************************************/
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
 	QDockWidget::setWidget(d->DockContainer);
 	QDockWidget::setFeatures(QDockWidget::DockWidgetClosable
@@ -719,8 +732,8 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 				this, &CFloatingDockContainer::onMaximizeRequest);
 	}
 #else
-	setWindowFlags(
-	    Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+	// setWindowFlags(Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 	QBoxLayout *l = new QBoxLayout(QBoxLayout::TopToBottom);
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);

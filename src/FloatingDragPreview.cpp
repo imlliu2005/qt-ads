@@ -274,7 +274,6 @@ void FloatingDragPreviewPrivate::createFloatingWidget()
 {
 	CDockWidget* DockWidget = qobject_cast<CDockWidget*>(Content);
 	CDockAreaWidget* DockArea = qobject_cast<CDockAreaWidget*>(Content);
-
 	CFloatingDockContainer* FloatingWidget = nullptr;
 
 	if (DockWidget && DockWidget->features().testFlag(CDockWidget::DockWidgetFloatable))
@@ -442,7 +441,6 @@ void CFloatingDragPreview::finishDragging()
 		{
 			DockArea = d->DropContainer->dockAreaAt(QCursor::pos());
 		}
-
 		d->DropContainer->dropWidget(d->Content, ContainerDropArea, DockArea,
 			d->DockManager->containerOverlay()->tabIndexUnderCursor());
 	}
@@ -450,7 +448,6 @@ void CFloatingDragPreview::finishDragging()
 	{
 		d->createFloatingWidget();
 	}
-
 	this->close();
 	d->DockManager->containerOverlay()->hideOverlay();
 	d->DockManager->dockAreaOverlay()->hideOverlay();

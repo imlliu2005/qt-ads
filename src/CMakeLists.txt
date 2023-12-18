@@ -37,6 +37,7 @@ set(ads_SRCS
     AutoHideDockContainer.cpp
     PushButton.cpp
 	ResizeHandle.cpp
+    title_bar.cpp
     ads.qrc
 )
 set(ads_HEADERS
@@ -63,6 +64,7 @@ set(ads_HEADERS
     AutoHideDockContainer.h
     PushButton.h
 	ResizeHandle.h
+    title_bar.h
 )
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 if (UNIX AND NOT APPLE)

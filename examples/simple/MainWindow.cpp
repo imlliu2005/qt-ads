@@ -46,11 +46,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnCustMenuTriggered()
 {
-	qDebug() << "1 ...";
-	// 设置窗口固定不可拽
+	qDebug() << "1 set_window_size ...";
+	// 
 	DockWidget->set_window_size(200,600);
-	qDebug() << "2 ...";
-	// 改变窗口大小
+	qDebug() << "2 set_window_fixed ...";
+	// 
 	DockWidget->set_window_fixed(true);
 	
 }
