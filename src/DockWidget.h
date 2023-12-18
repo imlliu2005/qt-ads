@@ -525,6 +525,13 @@ public:
      */
 
     void set_window_size(int width, int height);
+    
+    /**
+     * Set dock window fixed
+     */
+
+    void set_window_fixed(bool fixed);
+
 
     /**
      * Set the actions that will be shown in the dock area title bar

@@ -399,6 +399,14 @@ public:
      * get window height
      */
 	int get_window_height(); 
+	/**
+     * get window height
+     */
+	void set_window_fixed(bool fixed);
+	/**
+     * get window fixed flag
+     */
+	bool get_window_fixed_flag();
 
 public Q_SLOTS:
 	/**

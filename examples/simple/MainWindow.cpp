@@ -6,7 +6,6 @@
 #include <QTimer>
 
 #include <QAction>
-#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -47,7 +46,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnCustMenuTriggered()
 {
+	qDebug() << "1 ...";
+	// 设置窗口固定不可拽
 	DockWidget->set_window_size(200,600);
-    QMessageBox::information(this,this->windowTitle(),QStringLiteral("Set window size success!"));
+	qDebug() << "2 ...";
+	// 改变窗口大小
+	DockWidget->set_window_fixed(true);
+	
 }
 

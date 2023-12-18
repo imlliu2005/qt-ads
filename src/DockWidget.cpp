@@ -1331,11 +1331,26 @@ CDockWidget::eToolBarStyleSource CDockWidget::toolBarStyleSource() const
 	return d->ToolBarStyleSource;
 }
 
+//============================================================================
 void CDockWidget::set_window_size(int width, int height)
 {
 	if(d->DockArea) 
 	{
 		d->DockArea->set_window_size(width, height);
+	}
+	else 
+	{
+		qDebug() << "d->DockArea is nullptr ...";
+	}
+}
+
+//============================================================================
+void CDockWidget::set_window_fixed(bool fixed)
+{
+
+	if(d->DockArea) 
+	{
+		d->DockArea->set_window_fixed(fixed);
 	}
 	else 
 	{

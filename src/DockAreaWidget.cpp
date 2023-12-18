@@ -266,6 +266,7 @@ struct DockAreaWidgetPrivate
 	CDockAreaWidget::DockAreaFlags Flags{CDockAreaWidget::DefaultFlags};
 	int window_width_ = 0;
 	int window_height_ = 0;
+	bool fixed_flag_ = false;
 
 	/**
 	 * Private data constructor
@@ -346,6 +347,10 @@ struct DockAreaWidgetPrivate
 	{
 		window_width_ = width;
 		window_height_ = height;
+	}
+
+	void set_window_fixed(bool fixed) {
+		fixed_flag_ = fixed;
 	}
 };
 
@@ -1440,10 +1445,19 @@ QSize CDockAreaWidget::minimumSizeHint() const
 }
 
 //============================================================================
+void CDockAreaWidget::set_window_fixed(bool fixed) 
+{
+	d->set_window_fixed(fixed);
+}
+//============================================================================
+bool CDockAreaWidget::get_window_fixed_flag() 
+{
+	return d->fixed_flag_;
+}
+//============================================================================
 void CDockAreaWidget::set_window_size(int width, int height) 
 {
 	d->set_window_size(width, height);
-	qDebug() << " window height: " << height;
 }
 
 //============================================================================
