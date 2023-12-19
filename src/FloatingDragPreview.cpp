@@ -293,7 +293,6 @@ void FloatingDragPreviewPrivate::createFloatingWidget()
 		{
 			FloatingWidget->setFixedSize(window_width_,window_height_);
 		}
-
 		FloatingWidget->show();
 		if (!CDockManager::testConfigFlag(CDockManager::DragPreviewHasWindowFrame))
 		{

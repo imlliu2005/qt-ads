@@ -41,7 +41,7 @@
 
             Q_DECLARE_FLAGS(WindowButtons, WindowButton)
             Q_DECLARE_OPERATORS_FOR_FLAGS(WindowButtons)
-        } // namespace QCustomAttrs
+        }  // namespace QCustomAttrs
 
         class QTitleBar : public QWidget
         {
@@ -49,7 +49,6 @@
             Q_PROPERTY(QCustomAttrs::WindowButtons windowButtons READ windowButtons WRITE setWindowButtons)
             Q_CLASSINFO("custom_obj_type", "QTitleBar")
         public:
-            // explicit QTitleBar(QWidget *parent = nullptr);
             explicit QTitleBar(CFloatingDockContainer *parent = nullptr);
 
             void setWindowButtons(QCustomAttrs::WindowButtons btns);
@@ -58,6 +57,7 @@
             void setWindowButtonEnabled(QCustomAttrs::WindowButton btn, bool enabled = true);
             void set_restore_icon();
             void set_maximize_icon();
+            void set_titlebar_title(QString title);
 
         protected:
             void paintEvent(QPaintEvent *event) override;
@@ -71,13 +71,7 @@
 
             CFloatingDockContainer *FloatingWidget = nullptr;
             eDragState DragState = DraggingInactive;
-            bool canMove;
-            bool maximizing;
-
-            QPoint m_pCursor;
             const QSize FRAME_BUTTON_SIZE;
-
-            // QWidget *m_parentWindow;
 
             QCustomAttrs::WindowButtons m_frameButtons;
 

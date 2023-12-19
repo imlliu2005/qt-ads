@@ -7,20 +7,16 @@
 
     namespace ads
     {
-
-        QTitleBar::QTitleBar(CFloatingDockContainer *parent) : QWidget(parent), FRAME_BUTTON_SIZE(44, 34)
+        QTitleBar::QTitleBar(CFloatingDockContainer *parent) : QWidget(parent), FRAME_BUTTON_SIZE(30, 30)
         {
-            this->canMove = false;
-            this->maximizing = false;
             this->m_frameButtons = QCustomAttrs::All;
 
             if (!parent)
             {
                 throw std::invalid_argument("Parent must be a QCustomWindow object (cannot be null).");
             } 
-            this->FloatingWidget = parent;
 
-            this->lbl_windowTitle.setText("QCustomWindow");
+            this->FloatingWidget = parent;
             this->lbl_windowTitle.setObjectName("TitleBar_title");
             this->lbl_windowTitle.setMouseTracking(true);
             setMouseTracking(true);
@@ -34,12 +30,6 @@
             this->btn_minimize.setObjectName("TitleBar_Btn_Minimize");
             this->btn_maximize.setObjectName("TitleBar_Btn_Maximize");
             this->btn_close.setObjectName("TitleBar_Btn_Close");
-            // this->btn_minimize.setToolTip(QObject::tr("Minimize"));
-            // this->btn_maximize.setToolTip(QObject::tr("Maximize"));
-            // this->btn_close.setToolTip(QObject::tr("Close"));
-            // this->btn_close.setText("X");
-            // this->btn_maximize.setText("+");
-            // this->btn_minimize.setText("-");
 
             this->btn_close.setMaximumSize(FRAME_BUTTON_SIZE);
             this->btn_close.setMinimumSize(FRAME_BUTTON_SIZE);
@@ -61,15 +51,15 @@
                     { emit this->requestClose(); });
             connect(&this->btn_minimize, &QPushButton::clicked, [this]
                     { emit this->requestMinimize(); });
-            // connect(&this->btn_maximize, &QPushButton::clicked, [this]
-            //         { emit this->requestMaximize(); });
             connect(&this->btn_maximize, &QPushButton::clicked, this, &QTitleBar::_slot_maximize);
 
             connect(this, &QWidget::windowTitleChanged, &this->lbl_windowTitle, &QLabel::setText);
             this->setObjectName("QTitleBar");
+        }
 
-            // this->setMaximumHeight(34);
-            // this->setMinimumHeight(34);
+        void QTitleBar::set_titlebar_title(QString title) 
+        {
+            this->lbl_windowTitle.setText(title);
         }
 
         void QTitleBar::setWindowButtons(QCustomAttrs::WindowButtons btns)
@@ -92,7 +82,6 @@
 
         void QTitleBar::paintEvent(QPaintEvent *event)
         {
-            // LOG_EVERY_N(INFO, 100) << "titlebar paintEvent" << std::endl;
             QStyleOption opt;
             opt.init(this);
             QPainter p(this);
@@ -102,12 +91,6 @@
 
         void QTitleBar::mousePressEvent(QMouseEvent *event)
         {
-            // if (event->button() & Qt::LeftButton)
-            // {
-            //     this->canMove = (event->x() > 5 && event->y() > 5 && event->x() < (this->FloatingWidget->width() - 5));
-            //     this->m_pCursor = event->globalPos() - this->FloatingWidget->geometry().topLeft();
-            // }
-
             if (event->button() == Qt::LeftButton)
             {
                 DragState = DraggingFloatingWidget;
@@ -130,12 +113,6 @@
 
         void QTitleBar::mouseMoveEvent(QMouseEvent *event)
         {
-            // if (!this->maximizing && canMove && event->buttons() & Qt::LeftButton && !this->FloatingWidget->isMaximized())
-            // {
-            //      this->FloatingWidget->move(event->globalPos() - m_pCursor);
-            // }
-      
-            // this->maximizing = false;
             if (!(event->buttons() & Qt::LeftButton) || DraggingInactive == DragState)
             {
                 DragState = DraggingInactive;
@@ -159,15 +136,15 @@
 
         void QTitleBar::mouseDoubleClickEvent(QMouseEvent *event)
         {
-            if (m_frameButtons & QCustomAttrs::Maximize && btn_maximize.isEnabled() && event->buttons() & Qt::LeftButton)
+            if (event->buttons() & Qt::LeftButton)
             {
-                this->maximizing = true;
-                _maximize_restore_switch();
                 emit requestMaximize();
+                event->accept();
             }
-            // else
-                // LOG_WARN << "mouseDoubleClickEvent not maximize" << std::endl;
-            QWidget::mouseDoubleClickEvent(event);
+            else
+            {
+                QWidget::mouseDoubleClickEvent(event);
+            }
         }
 
         void QTitleBar::_slot_maximize()
@@ -189,16 +166,13 @@
         void QTitleBar::_maximize_restore_switch() // 切换显示最大化|还原
         {
             if (this->FloatingWidget->isMaximized())
-            // if(this->maximizing)
             {
                 // 还原事件
-                // LOG_WARN << "'''set to max icon" << std::endl;
                 set_maximize_icon();
             }
             else
             {
                 // 最大化事件
-                // LOG_WARN << "'''set to restore icon" << std::endl;
                 set_restore_icon();
             }
         }

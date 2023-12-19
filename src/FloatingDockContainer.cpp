@@ -667,11 +667,16 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 
 	connect(d->m_titleBar, &QTitleBar::requestClose,this, &CFloatingDockContainer::close);
     connect(d->m_titleBar, &QTitleBar::requestMaximize, [this](){
-            if (this->isMaximized())
-                this->showNormal();
-             else
-                this->showMaximized(); });
+            if (this->isMaximized()){
+				this->showNormal();
+			}
+            else {
+				this->showMaximized(); 
+			}});
     connect(d->m_titleBar, &QTitleBar::requestMinimize,this, &CFloatingDockContainer::showMinimized);
+
+	connect(this, &QMainWindow::windowTitleChanged, d->m_titleBar,&QWidget::setWindowTitle);
+
 	/************************************************************************/
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
 	QDockWidget::setWidget(d->DockContainer);
@@ -738,6 +743,9 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
 	setLayout(l);
+	
+	// titlebar add layout 
+	l->addWidget(d->m_titleBar);
 	l->addWidget(d->DockContainer);
 #endif
 
