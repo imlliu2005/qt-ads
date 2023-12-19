@@ -1,4 +1,5 @@
 #include "title_bar.h"
+#include "FloatingDockContainer.h"
 
 #ifdef _DEBUG
 #define new new (_NORMAL_BLOCK, __FILE__, __LINE__) // 定义new宏来替换new关键字。
@@ -7,49 +8,25 @@
     namespace ads
     {
 
-        QTitleBar::QTitleBar(QWidget *parent) : QWidget(parent), FRAME_BUTTON_SIZE(44, 34)
+        QTitleBar::QTitleBar(CFloatingDockContainer *parent) : QWidget(parent), FRAME_BUTTON_SIZE(44, 34)
         {
             this->canMove = false;
             this->maximizing = false;
             this->m_frameButtons = QCustomAttrs::All;
 
-//            this->setStyleSheet(QStringLiteral(
-//                "QPushButton {\n"
-//                "   border : 0px solid gray;\n"
-//                "   border-radius: 0px;\n"
-//                "   min-height: 20px;\n"
-//                "   margin: 0px;\n"
-//                "   background: transparent;\n"
-//                "   color: gray;\n"
-//                "}\n"
-//                "QPushButton::hover {\n"
-//                "   background: transparent;\n"
-//                "   border : 0px solid darkorange;\n"
-//                "   color: white;\n"
-//                "}\n"
-//                "QPushButton::pressed, QPushButton::!enabled {\n"
-//                "   background: transparent;\n"
-//                "   border : 0px solid orange;\n"
-//                "   color: white;\n"
-//                "}\n"
-//                // "QTitleBar { background: rgb(58, 91, 164); }\n"
-//                // "QWidget { background: rgb(58, 91, 164); }\n"
-//                ));
-
             if (!parent)
+            {
                 throw std::invalid_argument("Parent must be a QCustomWindow object (cannot be null).");
-            this->m_parentWindow = parent;
+            } 
+            this->FloatingWidget = parent;
 
             this->lbl_windowTitle.setText("QCustomWindow");
             this->lbl_windowTitle.setObjectName("TitleBar_title");
             this->lbl_windowTitle.setMouseTracking(true);
             setMouseTracking(true);
-            // this->lbl_windowTitle.setAlignment(Qt::AlignCenter);
             this->lbl_windowTitle.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-            // this->lbl_windowTitle.setStyleSheet("QLabel{background-color:rgb(58, 91, 164); color:rgb(255, 255, 255); }");
-
             this->btn_minimize.setIcon(QIcon(":/res/title_btn_minimize.png"));
-            if (this->m_parentWindow->isMaximized())
+            if (this->FloatingWidget->isMaximized())
                 set_restore_icon();
             else
                 set_maximize_icon();
@@ -125,21 +102,58 @@
 
         void QTitleBar::mousePressEvent(QMouseEvent *event)
         {
-            if (event->button() & Qt::LeftButton)
+            // if (event->button() & Qt::LeftButton)
+            // {
+            //     this->canMove = (event->x() > 5 && event->y() > 5 && event->x() < (this->FloatingWidget->width() - 5));
+            //     this->m_pCursor = event->globalPos() - this->FloatingWidget->geometry().topLeft();
+            // }
+
+            if (event->button() == Qt::LeftButton)
             {
-                this->canMove = (event->x() > 5 && event->y() > 5 && event->x() < (this->m_parentWindow->width() - 5));
-                this->m_pCursor = event->globalPos() - this->m_parentWindow->geometry().topLeft();
+                DragState = DraggingFloatingWidget;
+                FloatingWidget->startDragging(event->pos(), FloatingWidget->size(),
+                    this);
+                return;
             }
             QWidget::mousePressEvent(event);
+        }
+        //============================================================================
+        void QTitleBar::mouseReleaseEvent(QMouseEvent *event)
+        {
+            DragState = DraggingInactive;
+            if (FloatingWidget)
+            {
+                FloatingWidget->finishDragging();
+            }
+            QWidget::mouseReleaseEvent(event);
         }
 
         void QTitleBar::mouseMoveEvent(QMouseEvent *event)
         {
-            if (!this->maximizing && canMove && event->buttons() & Qt::LeftButton && !this->m_parentWindow->isMaximized())
-                this->m_parentWindow->move(event->globalPos() - m_pCursor);
-            // else
-                // LOG_WARN << "cannot move, isMaximized = " << this->m_parentWindow->isMaximized() << std::endl;
-            this->maximizing = false;
+            // if (!this->maximizing && canMove && event->buttons() & Qt::LeftButton && !this->FloatingWidget->isMaximized())
+            // {
+            //      this->FloatingWidget->move(event->globalPos() - m_pCursor);
+            // }
+      
+            // this->maximizing = false;
+            if (!(event->buttons() & Qt::LeftButton) || DraggingInactive == DragState)
+            {
+                DragState = DraggingInactive;
+                QWidget::mouseMoveEvent(event);
+                return;
+            }
+
+            // move floating window
+            if (DraggingFloatingWidget == DragState)
+            {
+                if(FloatingWidget->isMaximized())
+                {
+                    FloatingWidget->showNormal();
+                }
+                FloatingWidget->moveFloating();
+                QWidget::mouseMoveEvent(event);
+                return;
+            }
             QWidget::mouseMoveEvent(event);
         }
 
@@ -147,7 +161,6 @@
         {
             if (m_frameButtons & QCustomAttrs::Maximize && btn_maximize.isEnabled() && event->buttons() & Qt::LeftButton)
             {
-                // LOG_WARN << "mouseDoubleClickEvent request Maximize" << std::endl;
                 this->maximizing = true;
                 _maximize_restore_switch();
                 emit requestMaximize();
@@ -175,7 +188,7 @@
 
         void QTitleBar::_maximize_restore_switch() // 切换显示最大化|还原
         {
-            if (this->m_parentWindow->isMaximized())
+            if (this->FloatingWidget->isMaximized())
             // if(this->maximizing)
             {
                 // 还原事件

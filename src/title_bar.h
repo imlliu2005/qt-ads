@@ -22,12 +22,12 @@
 #include <QPaintEvent>
 #include <QPushButton>
 #include <QStyleOption>
-
 #include <stdexcept>
-
+#include "ads_globals.h"
 
     namespace ads
     {
+        class CFloatingDockContainer;
 
         namespace QCustomAttrs
         {
@@ -49,7 +49,8 @@
             Q_PROPERTY(QCustomAttrs::WindowButtons windowButtons READ windowButtons WRITE setWindowButtons)
             Q_CLASSINFO("custom_obj_type", "QTitleBar")
         public:
-            explicit QTitleBar(QWidget *parent = nullptr);
+            // explicit QTitleBar(QWidget *parent = nullptr);
+            explicit QTitleBar(CFloatingDockContainer *parent = nullptr);
 
             void setWindowButtons(QCustomAttrs::WindowButtons btns);
             inline QCustomAttrs::WindowButtons windowButtons() const { return this->m_frameButtons; }
@@ -61,21 +62,22 @@
         protected:
             void paintEvent(QPaintEvent *event) override;
             void mouseMoveEvent(QMouseEvent *event) override;
+            void mouseReleaseEvent(QMouseEvent *ev) override;
             void mousePressEvent(QMouseEvent *event) override;
             void mouseDoubleClickEvent(QMouseEvent *event) override;
 
         private:
             void _maximize_restore_switch(); // 切换显示最大化|还原
 
-
-        private:
+            CFloatingDockContainer *FloatingWidget = nullptr;
+            eDragState DragState = DraggingInactive;
             bool canMove;
             bool maximizing;
 
             QPoint m_pCursor;
             const QSize FRAME_BUTTON_SIZE;
 
-            QWidget *m_parentWindow;
+            // QWidget *m_parentWindow;
 
             QCustomAttrs::WindowButtons m_frameButtons;
 

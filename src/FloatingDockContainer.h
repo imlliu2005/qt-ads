@@ -117,6 +117,7 @@ private:
 	friend class CDockWidget;
 	friend class CDockAreaWidget;
     friend class CFloatingWidgetTitleBar;
+	friend class QTitleBar;
 
 private Q_SLOTS:
 	void onDockAreasAddedOrRemoved();
