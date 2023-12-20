@@ -21,15 +21,17 @@
             this->lbl_windowTitle.setMouseTracking(true);
             setMouseTracking(true);
             this->lbl_windowTitle.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-            this->btn_minimize.setIcon(QIcon(":/res/title_btn_minimize.png"));
-            if (this->FloatingWidget->isMaximized())
+            if (this->FloatingWidget->isMaximized()) {
                 set_restore_icon();
-            else
+            }
+            else {
                 set_maximize_icon();
-            this->btn_close.setIcon(QIcon(":/res/title_btn_close.png"));
+            }
+                
             this->btn_minimize.setObjectName("TitleBar_Btn_Minimize");
             this->btn_maximize.setObjectName("TitleBar_Btn_Maximize");
             this->btn_close.setObjectName("TitleBar_Btn_Close");
+            this->setObjectName("QTitleBar");
 
             this->btn_close.setMaximumSize(FRAME_BUTTON_SIZE);
             this->btn_close.setMinimumSize(FRAME_BUTTON_SIZE);
@@ -37,6 +39,7 @@
             this->btn_maximize.setMinimumSize(FRAME_BUTTON_SIZE);
             this->btn_minimize.setMaximumSize(FRAME_BUTTON_SIZE);
             this->btn_minimize.setMinimumSize(FRAME_BUTTON_SIZE);
+
             this->m_layout.addStretch();
             this->m_layout.addWidget(&this->lbl_windowTitle, 1);
             this->m_layout.addWidget(&this->btn_minimize);
@@ -54,7 +57,6 @@
             connect(&this->btn_maximize, &QPushButton::clicked, this, &QTitleBar::_slot_maximize);
 
             connect(this, &QWidget::windowTitleChanged, &this->lbl_windowTitle, &QLabel::setText);
-            this->setObjectName("QTitleBar");
         }
 
         void QTitleBar::set_titlebar_title(QString title) 

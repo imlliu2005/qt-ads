@@ -39,6 +39,14 @@
 #else
 #include <QWidget>
 #define tFloatingWidgetBase QWidget
+
+#ifndef GET_X_LPARAM
+    #define GET_X_LPARAM(lParam)    ((int)(short)LOWORD(lParam))
+#endif
+ 
+#ifndef GET_Y_LPARAM
+    #define GET_Y_LPARAM(lParam)    ((int)(short)HIWORD(lParam))
+#endif
 #endif
 
 class CDockingStateReader;
@@ -201,7 +209,6 @@ protected: // reimplements QWidget
 #endif
 #endif
 
-
 public:
 	using Super = tFloatingWidgetBase;
 
@@ -262,6 +269,7 @@ public:
 	 * This function hides the floating bar instantely and delete it later.
 	 */
 	void hideAndDeleteLater();
+
 
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
     /**

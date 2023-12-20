@@ -121,11 +121,20 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 	border: none;
 	padding: 0px -2px;
 	qproperty-icon: url(:/ads/images/close-button.svg),
-			url(:/ads/images/close-button-disabled.svg) disabled;
+		url(:/ads/images/close-button-disabled.svg) disabled;
 	qproperty-iconSize: 16px;
+} 
+
+#TitleBar_Btn_Close:hover {
+	border: 1px solid rgba(0, 0, 0, 32);
+	background: rgba(0, 0, 0, 16);
 }
 
-#TitleBar_Btn_Maximize {
+#TitleBar_Btn_Close:pressed {
+	background: rgba(0, 0, 0, 32);
+}
+
+ #TitleBar_Btn_Maximize {
 	margin-top: 2px;
 	background: none;
 	border: none;
@@ -140,7 +149,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 	background: none;
 	border: none;
 	padding: 0px -2px;
-	qproperty-icon: url(:/ads/images/minimize-button.svg)
+	qproperty-icon: url(:/ads/images/minimize-button.svg);
 	qproperty-iconSize: 16px;
 }
 
