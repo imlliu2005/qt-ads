@@ -804,6 +804,8 @@ void CFloatingDockContainer::setResizeCursor(ResizeRegion region)
     switch (region)
     {
     case North:
+		setCursor(Qt::SizeBDiagCursor);
+		break;
     case South:
         setCursor(Qt::SizeVerCursor);
         break;
