@@ -383,7 +383,11 @@ struct FloatingDockContainerPrivate
 #ifdef Q_OS_WIN
 	QTitleBar *m_titleBar = nullptr;
 	//m_nBorder表示鼠标位于边框缩放范围的宽度
-	int m_nBorderWidth = 5; 
+    bool m_drag;
+    QPoint dragPos, resizeDownPos;
+    const int resizeBorderWidth = 5;
+    ResizeRegion resizeRegion;
+    QRect mouseDownRect;
 #endif
 	/**
 	 * Private data constructor
@@ -754,12 +758,155 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 	DockManager->registerFloatingWidget(this);
 }
 
+#ifdef Q_OS_WIN
+//============================================================================
+void CFloatingDockContainer::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        d->m_drag = true;
+        d->dragPos = event->pos();
+        d->resizeDownPos = event->globalPos();
+        d->mouseDownRect = this->rect();
+    }
+}
+
+void CFloatingDockContainer::mouseMoveEvent(QMouseEvent * event)
+{
+    if (d->resizeRegion != Default)
+    {
+        handleResize();
+        return;
+    }
+    QPoint clientCursorPos = event->pos();
+    QRect r = this->rect();
+    QRect resizeInnerRect(d->resizeBorderWidth, d->resizeBorderWidth, r.width() - 2*d->resizeBorderWidth, r.height() - 2*d->resizeBorderWidth);
+    if(r.contains(clientCursorPos) && !resizeInnerRect.contains(clientCursorPos))
+	 {
+		//调整窗体大小
+        ResizeRegion resizeReg = getResizeRegion(clientCursorPos);
+        setResizeCursor(resizeReg);
+        if (d->m_drag && (event->buttons() & Qt::LeftButton)) {
+            d->resizeRegion = resizeReg;
+            handleResize();
+        }
+    }
+}
+
+void CFloatingDockContainer::mouseReleaseEvent(QMouseEvent *event)
+{
+    d->m_drag = false;
+    d->resizeRegion = Default;
+    setCursor(Qt::ArrowCursor);
+}
+
+void CFloatingDockContainer::setResizeCursor(ResizeRegion region)
+{
+    switch (region)
+    {
+    case North:
+    case South:
+        setCursor(Qt::SizeVerCursor);
+        break;
+    case East:
+    case West:
+        setCursor(Qt::SizeHorCursor);
+        break;
+    case NorthWest:
+    case SouthEast:
+        setCursor(Qt::SizeFDiagCursor);
+        break;
+    default:
+        setCursor(Qt::SizeBDiagCursor);
+        break;
+    }
+}
+
+ResizeRegion CFloatingDockContainer::getResizeRegion(QPoint clientPos)
+{
+    if (clientPos.y() <= d->resizeBorderWidth) {
+        if (clientPos.x() <= d->resizeBorderWidth)
+            return NorthWest;
+        else if (clientPos.x() >= this->width() - d->resizeBorderWidth)
+            return NorthEast;
+        else
+            return North;
+    }
+    else if (clientPos.y() >= this->height() - d->resizeBorderWidth) {
+        if (clientPos.x() <= d->resizeBorderWidth)
+            return SouthWest;
+        else if (clientPos.x() >= this->width() - d->resizeBorderWidth)
+            return SouthEast;
+        else
+            return South;
+    }
+    else {
+        if (clientPos.x() <= d->resizeBorderWidth)
+            return West;
+        else
+            return East;
+    }
+}
+
+void CFloatingDockContainer::handleResize()
+{
+    int xdiff = QCursor::pos().x() - d->resizeDownPos.x();
+    int ydiff = QCursor::pos().y() - d->resizeDownPos.y();
+    switch (d->resizeRegion)
+    {
+		case East:
+		{
+			resize(d->mouseDownRect.width() + xdiff, this->height());
+			break;
+		}
+		case West:
+		{
+			resize(d->mouseDownRect.width() - xdiff, this->height());
+			move(d->resizeDownPos.x() + xdiff, this->y());
+			break;
+		}
+		case South:
+		{
+			resize(this->width(), d->mouseDownRect.height() + ydiff);
+			break;
+		}
+		case North:
+		{
+			resize(this->width(), d->mouseDownRect.height() - ydiff);
+			move(this->x(), d->resizeDownPos.y() + ydiff);
+			break;
+		}
+		case SouthEast:
+		{
+			resize(d->mouseDownRect.width() + xdiff, d->mouseDownRect.height() + ydiff);
+			break;
+		}
+		case NorthEast:
+		{
+			resize(d->mouseDownRect.width() + xdiff, d->mouseDownRect.height() - ydiff);
+			move(this->x(), d->resizeDownPos.y() + ydiff);
+			break;
+		}
+		case NorthWest:
+		{
+			resize(d->mouseDownRect.width() - xdiff, d->mouseDownRect.height() - ydiff);
+			move(d->resizeDownPos.x() + xdiff, d->resizeDownPos.y()+ydiff);
+			break;
+		}
+		case SouthWest:
+		{
+			resize(d->mouseDownRect.width() - xdiff, d->mouseDownRect.height() + ydiff);
+			move(d->resizeDownPos.x() + xdiff, this->y());
+			break;
+		}
+    }
+}
+#endif
+
 //============================================================================
 CFloatingDockContainer::CFloatingDockContainer(CDockAreaWidget *DockArea) :
 	CFloatingDockContainer(DockArea->dockManager())
 {
 	d->DockContainer->addDockArea(DockArea);
-
     auto TopLevelDockWidget = topLevelDockWidget();
     if (TopLevelDockWidget)
     {
