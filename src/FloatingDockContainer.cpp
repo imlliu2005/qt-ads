@@ -371,6 +371,7 @@ struct FloatingDockContainerPrivate
 	QPoint DragStartMousePosition;
 	CDockContainerWidget *DropContainer = nullptr;
 	CDockAreaWidget *SingleDockArea = nullptr;
+	CDockAreaWidget *DockArea = nullptr;
 	QPoint DragStartPos;
 	bool Hiding = false;
 	bool AutoHideChildren = true;
@@ -379,13 +380,11 @@ struct FloatingDockContainerPrivate
     CFloatingWidgetTitleBar* TitleBar = nullptr;
 	bool IsResizing = false;
     bool MousePressed = false;
-#endif
-#ifdef Q_OS_WIN
+#else
 	QTitleBar *m_titleBar = nullptr;
-	//m_nBorder表示鼠标位于边框缩放范围的宽度
     bool m_drag;
     QPoint dragPos, resizeDownPos;
-    const int resizeBorderWidth = 5;
+    const int resizeBorderWidth = 4;
     ResizeRegion resizeRegion;
     QRect mouseDownRect;
 #endif
@@ -772,6 +771,12 @@ void CFloatingDockContainer::mousePressEvent(QMouseEvent *event)
 
 void CFloatingDockContainer::mouseMoveEvent(QMouseEvent * event)
 {
+		// 如果设置为fixed window 那么就不处理窗口拖拽
+	if (d->DockArea->get_window_fixed_flag())
+	{
+		return QWidget::mouseMoveEvent(event);
+	}
+
     if (d->resizeRegion != Default)
     {
         handleResize();
@@ -908,6 +913,7 @@ void CFloatingDockContainer::handleResize()
 CFloatingDockContainer::CFloatingDockContainer(CDockAreaWidget *DockArea) :
 	CFloatingDockContainer(DockArea->dockManager())
 {
+	d->DockArea = DockArea;
 	d->DockContainer->addDockArea(DockArea);
     auto TopLevelDockWidget = topLevelDockWidget();
     if (TopLevelDockWidget)
