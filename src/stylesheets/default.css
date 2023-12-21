@@ -109,6 +109,10 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     min-height:30px;  
     max-height:30px;  
     background-color:rgb(30, 59, 127);
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 #TitleBar_title {
@@ -145,7 +149,7 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
 }
 
 #TitleBar_Btn_Minimize {
-	margin-top: 2px;
+	margin-top: -2px;
 	background: none;
 	border: none;
 	padding: 0px -2px;
@@ -168,7 +172,6 @@ QScrollArea#dockWidgetScrollArea {
 	padding: 0px;
 	border: none;
 }
-
 
 /*****************************************************************************
  *

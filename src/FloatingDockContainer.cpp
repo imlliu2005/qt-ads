@@ -746,12 +746,13 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 #else
 	// setWindowFlags(Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-	QBoxLayout *l = new QBoxLayout(QBoxLayout::TopToBottom);
-	l->setContentsMargins(0, 0, 0, 0);
-	setLayout(l);
-	// titlebar add layout 
+	QVBoxLayout *l = new QVBoxLayout();
 	l->addWidget(d->m_titleBar);
 	l->addWidget(d->DockContainer);
+	l->setContentsMargins(0, 0, 0, 0);
+	l->setSpacing(0);
+	setLayout(l);
+	
 #endif
 
 	DockManager->registerFloatingWidget(this);

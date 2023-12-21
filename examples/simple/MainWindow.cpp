@@ -25,10 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	l->setWordWrap(true);
 	l->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 	l->setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. ");
-
+ 	l->setStyleSheet("QLabel{border:1px solid rgb(0, 250, 0);}");
 	// Create a dock widget with the title Label 1 and set the created label
 	// as the dock widget content
-	DockWidget = new ads::CDockWidget("Label 1");
+	DockWidget = new ads::CDockWidget("Label1");
 	DockWidget->setWidget(l);
 
 	// Add the toggleViewAction of the dock widget to the menu to give
