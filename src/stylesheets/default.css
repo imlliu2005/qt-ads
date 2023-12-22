@@ -109,10 +109,6 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
     min-height:30px;  
     max-height:30px;  
     background-color:rgb(30, 59, 127);
-	margin-top: 0;
-	margin-bottom: 0;
-	margin-left: 0;
-	margin-right: 0;
 }
 
 #TitleBar_title {
@@ -162,9 +158,9 @@ ads--CDockWidgetTab[activeTab="true"] QLabel {
  *****************************************************************************/
 ads--CDockWidget {
 	background: palette(light);
-	border-color: palette(light);
+	border-color: rgb(3, 255, 3);
 	border-style: solid;
-	border-width: 1px 0 0 0;
+	/* border-width: 1px 0 0 0; */
 }
 
 

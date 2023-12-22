@@ -45,6 +45,9 @@
 #include "DockManager.h"
 #include "DockWidget.h"
 #include "DockOverlay.h"
+#include <qt_windows.h>
+
+
 #ifdef Q_OS_WIN
 #include "title_bar.h"
 #include <windows.h>
@@ -382,11 +385,7 @@ struct FloatingDockContainerPrivate
     bool MousePressed = false;
 #else
 	QTitleBar *m_titleBar = nullptr;
-    bool m_drag;
-    QPoint dragPos, resizeDownPos;
-    const int resizeBorderWidth = 4;
-    ResizeRegion resizeRegion;
-    QRect mouseDownRect;
+	const int n_border = 4;
 #endif
 	/**
 	 * Private data constructor
@@ -746,169 +745,17 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 #else
 	// setWindowFlags(Qt::Window | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
 	setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-	QVBoxLayout *l = new QVBoxLayout();
-	l->addWidget(d->m_titleBar);
-	l->addWidget(d->DockContainer);
+	setMouseTracking(true);
+	QBoxLayout *l = new QBoxLayout(QBoxLayout::TopToBottom);
 	l->setContentsMargins(0, 0, 0, 0);
 	l->setSpacing(0);
+	l->addWidget(d->m_titleBar);
+	l->addWidget(d->DockContainer);
 	setLayout(l);
-	
 #endif
 
 	DockManager->registerFloatingWidget(this);
 }
-
-#ifdef Q_OS_WIN
-//============================================================================
-void CFloatingDockContainer::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        d->m_drag = true;
-        d->dragPos = event->pos();
-        d->resizeDownPos = event->globalPos();
-        d->mouseDownRect = this->rect();
-    }
-}
-
-void CFloatingDockContainer::mouseMoveEvent(QMouseEvent * event)
-{
-		// 如果设置为fixed window 那么就不处理窗口拖拽
-	if (d->DockArea->get_window_fixed_flag())
-	{
-		return QWidget::mouseMoveEvent(event);
-	}
-
-    if (d->resizeRegion != Default)
-    {
-        handleResize();
-        return;
-    }
-    QPoint clientCursorPos = event->pos();
-    QRect r = this->rect();
-    QRect resizeInnerRect(d->resizeBorderWidth, d->resizeBorderWidth, r.width() - 2*d->resizeBorderWidth, r.height() - 2*d->resizeBorderWidth);
-    if(r.contains(clientCursorPos) && !resizeInnerRect.contains(clientCursorPos))
-	 {
-		//调整窗体大小
-        ResizeRegion resizeReg = getResizeRegion(clientCursorPos);
-        setResizeCursor(resizeReg);
-        if (d->m_drag && (event->buttons() & Qt::LeftButton)) {
-            d->resizeRegion = resizeReg;
-            handleResize();
-        }
-    }
-}
-
-void CFloatingDockContainer::mouseReleaseEvent(QMouseEvent *event)
-{
-    d->m_drag = false;
-    d->resizeRegion = Default;
-    setCursor(Qt::ArrowCursor);
-}
-
-void CFloatingDockContainer::setResizeCursor(ResizeRegion region)
-{
-    switch (region)
-    {
-    case North:
-		setCursor(Qt::SizeBDiagCursor);
-		break;
-    case South:
-        setCursor(Qt::SizeVerCursor);
-        break;
-    case East:
-    case West:
-        setCursor(Qt::SizeHorCursor);
-        break;
-    case NorthWest:
-    case SouthEast:
-        setCursor(Qt::SizeFDiagCursor);
-        break;
-    default:
-        setCursor(Qt::SizeBDiagCursor);
-        break;
-    }
-}
-
-ResizeRegion CFloatingDockContainer::getResizeRegion(QPoint clientPos)
-{
-    if (clientPos.y() <= d->resizeBorderWidth) {
-        if (clientPos.x() <= d->resizeBorderWidth)
-            return NorthWest;
-        else if (clientPos.x() >= this->width() - d->resizeBorderWidth)
-            return NorthEast;
-        else
-            return North;
-    }
-    else if (clientPos.y() >= this->height() - d->resizeBorderWidth) {
-        if (clientPos.x() <= d->resizeBorderWidth)
-            return SouthWest;
-        else if (clientPos.x() >= this->width() - d->resizeBorderWidth)
-            return SouthEast;
-        else
-            return South;
-    }
-    else {
-        if (clientPos.x() <= d->resizeBorderWidth)
-            return West;
-        else
-            return East;
-    }
-}
-
-void CFloatingDockContainer::handleResize()
-{
-    int xdiff = QCursor::pos().x() - d->resizeDownPos.x();
-    int ydiff = QCursor::pos().y() - d->resizeDownPos.y();
-    switch (d->resizeRegion)
-    {
-		case East:
-		{
-			resize(d->mouseDownRect.width() + xdiff, this->height());
-			break;
-		}
-		case West:
-		{
-			resize(d->mouseDownRect.width() - xdiff, this->height());
-			move(d->resizeDownPos.x() + xdiff, this->y());
-			break;
-		}
-		case South:
-		{
-			resize(this->width(), d->mouseDownRect.height() + ydiff);
-			break;
-		}
-		case North:
-		{
-			resize(this->width(), d->mouseDownRect.height() - ydiff);
-			move(this->x(), d->resizeDownPos.y() + ydiff);
-			break;
-		}
-		case SouthEast:
-		{
-			resize(d->mouseDownRect.width() + xdiff, d->mouseDownRect.height() + ydiff);
-			break;
-		}
-		case NorthEast:
-		{
-			resize(d->mouseDownRect.width() + xdiff, d->mouseDownRect.height() - ydiff);
-			move(this->x(), d->resizeDownPos.y() + ydiff);
-			break;
-		}
-		case NorthWest:
-		{
-			resize(d->mouseDownRect.width() - xdiff, d->mouseDownRect.height() - ydiff);
-			move(d->resizeDownPos.x() + xdiff, d->resizeDownPos.y()+ydiff);
-			break;
-		}
-		case SouthWest:
-		{
-			resize(d->mouseDownRect.width() - xdiff, d->mouseDownRect.height() + ydiff);
-			move(d->resizeDownPos.x() + xdiff, this->y());
-			break;
-		}
-    }
-}
-#endif
 
 //============================================================================
 CFloatingDockContainer::CFloatingDockContainer(CDockAreaWidget *DockArea) :
@@ -1012,6 +859,34 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 	MSG *msg = static_cast<MSG*>(message);
 	switch (msg->message)
 	{
+		case WM_NCHITTEST:
+		{
+			QPoint pos = mapFromGlobal(QPoint(LOWORD(msg->lParam), HIWORD(msg->lParam)));
+			bool bHorLeft = pos.x() < d->n_border;
+			bool bHorRight = pos.x() > width() - d->n_border;
+			bool bVertTop = pos.y() < d->n_border;
+			bool bVertBottom = pos.y() > height() - d->n_border;
+			if (bHorLeft && bVertTop)
+				*result = HTTOPLEFT;
+			else if (bHorLeft && bVertBottom)
+				*result = HTBOTTOMLEFT;
+			else if (bHorRight && bVertTop)
+				*result = HTTOPRIGHT;
+			else if (bHorRight && bVertBottom)
+				*result = HTBOTTOMRIGHT;
+			else if (bHorLeft)
+				*result = HTLEFT;
+			else if (bHorRight)
+				*result = HTRIGHT;
+			else if (bVertTop)
+				*result = HTTOP;
+			else if (bVertBottom)
+				*result = HTBOTTOM;
+			else
+				return false;
+			return true;
+        }
+		break;
 		case WM_MOVING:
 		{
 			if (d->isState(DraggingFloatingWidget))
@@ -1058,7 +933,7 @@ bool CFloatingDockContainer::nativeEvent(const QByteArray &eventType, void *mess
 			 }
 			 break;
 	}
-	return false;
+	return QWidget::nativeEvent(eventType, message, result);
 }
 #endif
 

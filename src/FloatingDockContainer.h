@@ -68,19 +68,6 @@ struct DockAreaTitleBarPrivate;
 class CFloatingWidgetTitleBar;
 class CDockingStateReader;
 
-enum ResizeRegion
-{
-    Default,
-    North,
-    NorthEast,
-    East,
-    SouthEast,
-    South,
-    SouthWest,
-    West,
-    NorthWest
-};
-
 /**
  * Pure virtual interface for floating widgets.
  * This interface is used for opaque and non-opaque undocking. If opaque
@@ -282,15 +269,6 @@ public:
 	 * This function hides the floating bar instantely and delete it later.
 	 */
 	void hideAndDeleteLater();
-
-#ifdef Q_OS_WIN
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent * event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void setResizeCursor(ResizeRegion region);
-	ResizeRegion getResizeRegion(QPoint clientPos);
-	void handleResize();
-#endif
 
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
     /**

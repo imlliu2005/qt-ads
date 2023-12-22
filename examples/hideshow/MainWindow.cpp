@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QLabel* l = new QLabel();
 	l->setWordWrap(true);
 	l->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    l->setStyleSheet("QLabel{border:1px solid rgb(0, 250, 0);}");
 	l->setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. ");
 
 	// Create a dock widget with the title Label 1 and set the created label
